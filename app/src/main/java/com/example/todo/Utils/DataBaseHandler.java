@@ -1,5 +1,8 @@
 package com.example.todo.Utils;
 
+
+
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,14 +10,29 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
+
+
+
+
+
+
 import com.example.todo.Model.ToDoModel;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+
+
+
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+
 public class DataBaseHandler extends SQLiteOpenHelper {
+
+
+
 
     private static final int VERSION = 1;
     private static final String NAME = "toDoListDatabase";
@@ -27,14 +45,23 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             + TASK + " TEXT, " + STATUS + " INTEGER)";
     private SQLiteDatabase db;
 
+
+
+
     public DataBaseHandler(Context context) {
         super(context, NAME, null, VERSION);
     }
+
+
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TODO_TABLE);
     }
+
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -44,9 +71,15 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+
+
+
     public void openDatabase() {
         db = this.getWritableDatabase();
     }
+
+
+
 
     public void insertTask(ToDoModel task) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -54,8 +87,14 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put(TASK, task.getTask());
         values.put(STATUS, task.getStatus());
 
+
+
+
         long id = db.insert(TODO_TABLE, null, values);
         task.setId(String.valueOf(id)); // Set ID in model
+
+
+
 
         // Store in Firebase
         DatabaseReference firebaseDB = FirebaseDatabase.getInstance().getReference("Tasks");
@@ -66,8 +105,14 @@ public class DataBaseHandler extends SQLiteOpenHelper {
             firebaseDB.child(firebaseId).setValue(task);
         }
 
+
+
+
         db.close();
     }
+
+
+
 
     public List<ToDoModel> getAllTasks(){
         List<ToDoModel> taskList = new ArrayList<>();
@@ -75,6 +120,9 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         db.beginTransaction();
         try{
             cur = db.query(TODO_TABLE, new String[]{ID, TASK, STATUS}, null, null, null, null, null);
+
+
+
 
             if(cur != null){
                 if(cur.moveToFirst()){
@@ -97,17 +145,26 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         return taskList;
     }
 
+
+
+
     public void updateStatus(int id, int status){
         ContentValues cv = new ContentValues();
         cv.put(STATUS, status);
         db.update(TODO_TABLE, cv, ID + "= ?", new String[] {String.valueOf(id)});
     }
 
+
+
+
     public void updateTask(int id, String task) {
         ContentValues cv = new ContentValues();
         cv.put(TASK, task);
         db.update(TODO_TABLE, cv, ID + "= ?", new String[] {String.valueOf(id)});
     }
+
+
+
 
     public void deleteTask(int id){
         db.delete(TODO_TABLE, ID + "= ?", new String[] {String.valueOf(id)});
