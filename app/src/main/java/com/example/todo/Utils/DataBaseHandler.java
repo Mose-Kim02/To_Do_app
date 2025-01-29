@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 
 import com.example.todo.Model.ToDoModel;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +48,25 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         db = this.getWritableDatabase();
     }
 
-    public void insertTask(ToDoModel task){
-        ContentValues cv = new ContentValues();
-        cv.put(TASK, task.getTask());
-        cv.put(STATUS, 0);
-        db.insert(TODO_TABLE, null, cv);
+    public void insertTask(ToDoModel task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TASK, task.getTask());
+        values.put(STATUS, task.getStatus());
+
+        long id = db.insert(TODO_TABLE, null, values);
+        task.setId(String.valueOf(id)); // Set ID in model
+
+        // Store in Firebase
+        DatabaseReference firebaseDB = FirebaseDatabase.getInstance().getReference("Tasks");
+        String firebaseId = firebaseDB.push().getKey();
+        task.setFirebaseId(firebaseId);
+        if (firebaseId != null) {
+            task.setFirebaseId(firebaseId);
+            firebaseDB.child(firebaseId).setValue(task);
+        }
+
+        db.close();
     }
 
     public List<ToDoModel> getAllTasks(){

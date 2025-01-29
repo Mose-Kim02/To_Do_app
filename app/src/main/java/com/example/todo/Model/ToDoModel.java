@@ -4,6 +4,15 @@ public class ToDoModel {
     private String id;
     private String task;
 
+    private String firebaseId;
+
+    public String getFirebaseId() {
+        return firebaseId;
+    }
+    public void setFirebaseId(String firebaseId) {
+        this.firebaseId = firebaseId;
+    }
+
     public String  getId() {
         return id;
     }
